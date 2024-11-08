@@ -35,6 +35,16 @@ let notifySubscriber: Subscriber;
 const VM_LAUNCH_ERROR_MESSAGE = 'VM launch error';
 const GUIDE_LINK = 'https://github.com/containers/podman-desktop-extension-bootc/blob/main/docs/vm_launcher.md';
 
+// This is an issue with xterm not resizing properly when first initializing / loading
+// the terminal due to how we add padding. We must therefore call fit() approx 10ms after
+// initial loading to make sure the terminal is properly sized.
+// this is only called once when switching from no logs to logs
+$: if (noLogs === false) {
+  setTimeout(() => {
+    termFit?.fit();
+  }, 10);
+}
+
 // Event handlers for the WebSocket connection
 // which are needed to update the connection status
 function closeHandler(event: CloseEvent) {
@@ -308,7 +318,7 @@ export function goToHomePage(): void {
   <DiskImageConnectionStatus status={connectionStatus} />
 </div>
 <div
-  class="min-w-full flex flex-col p-[5px] pb-[10px] pr-0 bg-[var(--pd-terminal-background)]"
+  class="min-w-full flex flex-col p-[5px] pr-0 bg-[var(--pd-terminal-background)]"
   class:invisible={noLogs}
   class:h-0={noLogs}
   class:h-full={!noLogs}

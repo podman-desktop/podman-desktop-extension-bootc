@@ -24,6 +24,16 @@ let termFit: FitAddon;
 let logsTerminal: Terminal;
 let logInterval: NodeJS.Timeout;
 
+// This is an issue with xterm not resizing properly when first initializing / loading
+// the terminal due to how we add padding. We must therefore call fit() approx 10ms after
+// initial loading to make sure the terminal is properly sized.
+// this is only called once when switching from no logs to logs
+$: if (noLogs === false) {
+  setTimeout(() => {
+    termFit?.fit();
+  }, 10);
+}
+
 async function fetchFolderLogs() {
   if (!folder) {
     return;
